@@ -1,0 +1,24 @@
+services:
+  # Render Free has no persistent disk, so the API and pool UI intentionally
+  # run in one Web Service and share one in-process SQLite connection.
+  - type: web
+    name: whale2api-free
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    envVars:
+      # Render normally provides PORT=10000 to web services. Keeping it
+      # explicit makes the Blueprint's expected listener clear.
+      - key: PORT
+        value: "10000"
+      - key: WHALE2API_DATABASE_PATH
+        value: /data/whale2api.db
+      - key: WHALE2API_CHAT_HISTORY_PATH
+        value: /data/chat_history.json
+      - key: WHALE2API_EMBED_POOL_UI
+        value: "1"
+      - key: POOL_UI_ADMIN_TOKEN
+        generateValue: true
